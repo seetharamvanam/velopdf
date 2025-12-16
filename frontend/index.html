@@ -4,6 +4,23 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Immediately apply saved theme or time-of-day preference to avoid FOUC
+      (function(){
+        try{
+          var stored = localStorage.getItem('theme');
+          if (stored) {
+            document.documentElement.dataset.theme = stored;
+            return;
+          }
+          // If no preference is stored, pick theme based on local time: day => light, night => dark
+          var hr = new Date().getHours();
+          var isDay = hr >= 7 && hr < 19; // 7:00 - 18:59
+          var theme = isDay ? 'light' : 'dark';
+          document.documentElement.dataset.theme = theme;
+        }catch(e){}
+      })();
+    </script>
     <title>react</title>
   </head>
   <body>
