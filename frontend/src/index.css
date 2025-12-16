@@ -1,3 +1,5 @@
+@import "tailwindcss";
+@import "./styles/design.css";
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -24,10 +26,19 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* use normal document flow so the site fills the viewport edge-to-edge */
+  display: block;
+}
+
+.no-scroll{ overflow: hidden }
+html{ scroll-behavior: smooth }
+
+:focus-visible { outline: 3px solid rgba(124,58,237,0.18); outline-offset: 2px }
+
+@media (prefers-reduced-motion: reduce){
+  * { animation: none !important; transition: none !important }
 }
 
 h1 {
