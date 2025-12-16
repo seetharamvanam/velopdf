@@ -95,7 +95,7 @@ export default function Navbar() {
           if (!localStorage.getItem('theme')) {
             const t = getThemeByTime()
             setTheme(t)
-            document.documentElement.setAttribute('data-theme', t)
+            document.documentElement.dataset.theme = t
             // schedule the next one
             scheduleNextSwitch()
           }
@@ -109,11 +109,11 @@ export default function Navbar() {
       const stored = localStorage.getItem('theme')
       if (stored) {
         setTheme(stored)
-        document.documentElement.setAttribute('data-theme', stored)
+        document.documentElement.dataset.theme = stored
       } else {
         const t = getThemeByTime()
         setTheme(t)
-        document.documentElement.setAttribute('data-theme', t)
+        document.documentElement.dataset.theme = t
         scheduleNextSwitch()
       }
     } catch (e) {}
@@ -140,7 +140,7 @@ export default function Navbar() {
     try {
       localStorage.setItem('theme', next)
     } catch (e) {}
-    document.documentElement.setAttribute('data-theme', next)
+    document.documentElement.dataset.theme = next
   }
 
   return (
