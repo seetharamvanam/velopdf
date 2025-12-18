@@ -1,9 +1,25 @@
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { IconMerge } from '../components/icons'
+import React from 'react'
 import './ops.css'
+import MergeBoard from '../components/MergeBoard'
+
+
 
 export default function Merge() {
+  const [files, setFiles] = React.useState<File[]>([])
+  const [merged, setMerged] = React.useState(false)
+  const [ctaPulse, setCtaPulse] = React.useState(false)
+
+  function handleFilesChange(next: File[]) {
+    setFiles(next)
+    setCtaPulse(true)
+    setTimeout(() => setCtaPulse(false), 680)
+    // reset merged flag when new files are added
+    if (merged) setMerged(false)
+  }
+
   return (
     <main className="page page-ops">
       <section className="ops-hero">
@@ -12,37 +28,50 @@ export default function Merge() {
             <h1>Merge PDFs</h1>
             <p className="sub">Combine multiple PDF documents into a single file quickly and securely in your browser.</p>
             <div style={{ marginTop: 12 }}>
-              <label htmlFor="merge-upload">
-                <Button variant="primary" onClick={(e) => { e.preventDefault(); (document.getElementById('merge-upload') as HTMLInputElement | null)?.click() }}>Upload PDFs to merge</Button>
-              </label>
+              {files.length === 0 ? (
+                <>
+                  <Button variant="primary" className={ctaPulse ? 'cta-pulse' : ''} onClick={(e) => { e.preventDefault(); (document.getElementById('merge-upload') as HTMLInputElement | null)?.click() }}>
+                    Upload PDFs
+                  </Button>
+                  <input id="merge-upload" className="sr-only" type="file" accept="application/pdf" multiple onChange={(e)=>{
+                    const added = Array.from(e.currentTarget.files || [])
+                    if (added.length) {
+                      handleFilesChange([...(files || []), ...added])
+                      e.currentTarget.value = ''
+                    }
+                  }} />
+                </>
+              ) : null}
             </div>
-            <input id="merge-upload" className="sr-only" type="file" accept="application/pdf" multiple onChange={(e)=>{
-              const files = Array.from(e.currentTarget.files || [])
-              if (files.length) {
-                // For now dispatch first file; the UploadDemo is a single-file demo — in future we can extend
-                try { window.dispatchEvent(new CustomEvent('pdf-upload', { detail: files[0] })) } catch (err) {}
-                e.currentTarget.value = ''
-              }
-            }} />
 
-            <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
-              <button
-                className="btn ghost"
-                onClick={async (e) => {
-                  e.preventDefault()
-                  try {
-                    const m = await import('../utils/sample')
-                    const a = await m.createSamplePdf('sample-a.pdf', 'Sample A')
-                    const b = await m.createSamplePdf('sample-b.pdf', 'Sample B')
-                    window.dispatchEvent(new CustomEvent('pdf-upload', { detail: a }))
-                    setTimeout(() => window.dispatchEvent(new CustomEvent('pdf-upload', { detail: b })), 300)
-                  } catch (err) {
-                    // ignore
-                  }
-                }}
-              >
-                Try with sample files
-              </button>
+            <div style={{ marginTop: 12 }}>
+              <div className="merge-helper">{files.length ? 'Reorder thumbnails to set the merge order, then click Merge to download.' : 'Upload or drag files below to add them. Reorder thumbnails to set the merge order.'}</div>
+
+              {/* Stepper + status */}
+              <div style={{ marginTop: 12 }}>
+                <div className="stepper">
+                  <div className={`step ${files.length ? 'done' : ''}`}>
+                    <div className="step-icon">{files.length ? '✓' : '1'}</div>
+                    <div className="step-label">Upload</div>
+                  </div>
+                  <div className={`step ${files.length ? 'active' : ''}`}>
+                    <div className="step-icon">2</div>
+                    <div className="step-label">Arrange</div>
+                  </div>
+                  <div className={`step ${merged ? 'done' : ''}`}>
+                    <div className="step-icon">{merged ? '✓' : '3'}</div>
+                    <div className="step-label">Merge</div>
+                  </div>
+
+                  {files.length > 0 && (
+                    <div className={`status-pill ${ctaPulse ? 'pulse' : ''}`}>{files.length} file{files.length>1?'s':''} ready</div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                <MergeBoard files={files} onFilesChange={handleFilesChange} onMergeComplete={(f) => { try { window.dispatchEvent(new CustomEvent('pdf-upload', { detail: f })) } catch (err) {} ; try { setMerged(true) } catch(err){} }} />
+              </div>
             </div>
 
             <div className="ops-details">
@@ -83,6 +112,8 @@ export default function Merge() {
               <p>Upload multiple files and merge them in the order you choose.</p>
             </Card>
           </div>
+
+
         </div>
       </section>
     </main>

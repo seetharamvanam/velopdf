@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './Home.css'
+import './ops.css'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { IconPdf, IconMerge, IconSplit, IconCompress, IconConvert, IconEdit, IconSecure } from '../components/icons' 
@@ -9,8 +10,9 @@ export default function Home() {
   useEffect(() => { setMounted(true) }, [])
 
   return (
-    <main className="home-page">      <section className="hero">
-        <div className="hero-inner">
+    <main className="page page-ops home-page">
+      <section className="ops-hero">
+        <div className="ops-hero-inner">
           <div className="hero-copy">
             <h1 className="fade-up">All PDF Tools — Completely Free</h1>
             <p className="lead fade-up">
