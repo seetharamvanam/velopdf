@@ -2,8 +2,10 @@ import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { IconSecure } from '../components/icons'
 import './ops.css'
+import { useToast } from '../components/ToastProvider'
 
 export default function Secure() {
+  const { addToast } = useToast()
   return (
     <main className="page page-ops">
       <section className="ops-hero">
@@ -20,6 +22,7 @@ export default function Secure() {
               const file = e.currentTarget.files?.[0]
               if (file) {
                 try { window.dispatchEvent(new CustomEvent('pdf-upload', { detail: file })) } catch (err) {}
+                try { addToast('File added') } catch (err) {}
                 e.currentTarget.value = ''
               }
             }} />

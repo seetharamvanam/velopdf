@@ -4,10 +4,12 @@ import Card from '../components/ui/Card'
 import PdfViewer from '../components/PdfViewer'
 import { IconPdf } from '../components/icons'
 import './ops.css'
+import { useToast } from '../components/ToastProvider'
 
 export default function View() {
   const [viewerUrl, setViewerUrl] = useState<string | null>(null)
   const [filename, setFilename] = useState<string | null>(null)
+  const { addToast } = useToast()
 
   function loadFile(file: File) {
     if (!file) return
@@ -23,6 +25,7 @@ export default function View() {
     const u = URL.createObjectURL(file)
     setViewerUrl(u)
     setFilename(file.name)
+    try { addToast('File opened') } catch (err) {}
   }
 
   useEffect(() => {

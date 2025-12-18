@@ -53,6 +53,13 @@
 }
 .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 10px 30px rgba(8,10,20,0.45) }
 
+/* Shared button primitives used across pages */
+.btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1rem; border-radius: 10px; text-decoration: none; cursor: pointer; font-weight: 600; background: transparent; border: 1px solid transparent; color: var(--text) }
+.btn.primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color: #fff; border: none }
+.btn.ghost { background: rgba(255,255,255,0.04); color: var(--text); border: 1px solid rgba(255,255,255,0.06) }
+.btn.primary, .btn.ghost { transition: transform .18s var(--ease), box-shadow .18s var(--ease) }
+.btn.primary:hover{ transform: translateY(-3px); box-shadow: 0 12px 30px rgba(2,6,23,0.5) }
+
 /* global animations */
 .fade-up{ transform: translateY(8px); opacity: 0; animation: fadeUp var(--motion-medium) var(--ease) forwards }
 @keyframes fadeUp{ to{ transform: translateY(0); opacity: 1 } }
