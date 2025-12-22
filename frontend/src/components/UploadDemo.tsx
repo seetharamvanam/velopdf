@@ -9,7 +9,6 @@ type Props = {
 export default function UploadDemo({ file, onClose }: Props) {
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState<'idle' | 'uploading' | 'processing' | 'done' | 'error'>('idle')
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!file) {
@@ -42,16 +41,6 @@ export default function UploadDemo({ file, onClose }: Props) {
       if (!mounted) return
       setProgress(100)
       setStatus('done')
-
-      // create a downloadable url (mock: we return same file)
-      try {
-        if (file) {
-          const u = URL.createObjectURL(file)
-          setDownloadUrl(u)
-        }
-      } catch (e) {
-        setStatus('error')
-      }
     }
 
     runDemo()
@@ -59,12 +48,6 @@ export default function UploadDemo({ file, onClose }: Props) {
     return () => { mounted = false }
   }, [file])
 
-  useEffect(() => {
-    // cleanup url on unmount
-    return () => {
-      if (downloadUrl) URL.revokeObjectURL(downloadUrl)
-    }
-  }, [downloadUrl])
 
   const filename = file?.name ?? 'file.pdf'
 
@@ -85,9 +68,7 @@ export default function UploadDemo({ file, onClose }: Props) {
         </div>
 
         <div className="panel-actions">
-          {status === 'done' && downloadUrl ? (
-            <a className="btn primary" href={downloadUrl} download={`${filename.replace(/\.pdf$/i, '')}-processed.pdf`}>Download</a>
-          ) : status === 'error' ? (
+          {status === 'error' ? (
             <button className="btn ghost" onClick={() => setStatus('idle')}>Retry</button>
           ) : (
             <button className="btn ghost" onClick={onClose}>Close</button>
