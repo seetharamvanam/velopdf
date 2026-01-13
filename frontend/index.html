@@ -52,19 +52,21 @@
 
     <!-- Theme and Performance Script -->
     <script>
-      // Immediately apply saved theme or time-of-day preference to avoid FOUC
+      // Immediately apply saved theme or system preference to avoid FOUC
       (function(){
         try{
+          var html = document.documentElement;
           var stored = localStorage.getItem('theme');
-          if (stored) {
-            document.documentElement.dataset.theme = stored;
-            return;
+          var theme;
+          if (stored === 'dark' || stored === 'light') {
+            theme = stored;
+          } else {
+            // Fallback to system preference
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
           }
-          // If no preference is stored, pick theme based on local time: day => light, night => dark
-          var hr = new Date().getHours();
-          var isDay = hr >= 7 && hr < 19; // 7:00 - 18:59
-          var theme = isDay ? 'light' : 'dark';
-          document.documentElement.dataset.theme = theme;
+          html.dataset.theme = theme;
+          html.style.colorScheme = theme;
         }catch(e){}
 
         // Add performance observer
