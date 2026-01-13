@@ -712,7 +712,9 @@ export async function createBlankPdf(
     }
     
     const pdfBytes = await pdf.save()
-    return new Blob([pdfBytes], { type: 'application/pdf' })
+    // Convert to regular Uint8Array to avoid SharedArrayBuffer type issues
+    const bytes = new Uint8Array(pdfBytes)
+    return new Blob([bytes], { type: 'application/pdf' })
   } catch (error: any) {
     throw new Error(`Create blank PDF failed: ${error.message || String(error)}`)
   }
@@ -753,18 +755,17 @@ export async function createPdfFromText(
         font = await pdf.embedFont(StandardFonts.Helvetica)
     }
     
-    const page = pdf.addPage(pageSize)
+    let page = pdf.addPage(pageSize)
     const { width, height } = page.getSize()
     const maxWidth = width - margins.left - margins.right
-    const maxHeight = height - margins.top - margins.bottom
     
     let y = height - margins.top
     const lines = text.split('\n')
     
     for (const line of lines) {
       if (y < margins.bottom) {
-        // Add new page
-        const newPage = pdf.addPage(pageSize)
+        // Add new page and continue drawing on it
+        page = pdf.addPage(pageSize)
         y = height - margins.top
       }
       
@@ -781,7 +782,9 @@ export async function createPdfFromText(
     }
     
     const pdfBytes = await pdf.save()
-    return new Blob([pdfBytes], { type: 'application/pdf' })
+    // Convert to regular Uint8Array to avoid SharedArrayBuffer type issues
+    const bytes = new Uint8Array(pdfBytes)
+    return new Blob([bytes], { type: 'application/pdf' })
   } catch (error: any) {
     throw new Error(`Create PDF from text failed: ${error.message || String(error)}`)
   }
