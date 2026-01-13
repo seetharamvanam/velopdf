@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import { motion } from 'framer-motion'
 import * as pdfLib from 'pdf-lib'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
@@ -29,7 +28,9 @@ export default function Advanced() {
       const originalSize = file.size
       const newSize = pdfBytes.length
       
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+      // Convert to regular Uint8Array to avoid SharedArrayBuffer type issues
+      const bytes = new Uint8Array(pdfBytes)
+      const blob = new Blob([bytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -67,7 +68,9 @@ export default function Advanced() {
         }
 
         const pdfBytes = await mergedPdf.save()
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+        // Convert to regular Uint8Array to avoid SharedArrayBuffer type issues
+        const bytes = new Uint8Array(pdfBytes)
+        const blob = new Blob([bytes], { type: 'application/pdf' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url

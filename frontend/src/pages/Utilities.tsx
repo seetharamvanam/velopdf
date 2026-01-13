@@ -3,14 +3,14 @@
  * Headers/footers, page numbering, bates numbering, compare PDFs
  */
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
 import { validateFile, downloadBlob, loadPdfDocument } from '../utils/pdfUtils'
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import { StandardFonts, rgb } from 'pdf-lib'
 
 export default function Utilities() {
   const { addToast } = useToast()
@@ -32,7 +32,7 @@ export default function Utilities() {
   const [batesStartNumber, setBatesStartNumber] = useState(1)
   
   // Compare
-  const [file2, setFile2] = useState<File | null>(null)
+  // const [file2, setFile2] = useState<File | null>(null) // Reserved for future use
 
   async function handleUtility() {
     if (!file) return
@@ -50,7 +50,7 @@ export default function Utilities() {
 
         for (let i = 0; i < pages.length; i++) {
           const page = pages[i]
-          const { width, height } = page.getSize()
+          const { height } = page.getSize()
 
           if (headerText) {
             page.drawText(headerText, {
@@ -74,7 +74,8 @@ export default function Utilities() {
         }
 
         const pdfBytes = await doc.save()
-        blob = new Blob([pdfBytes], { type: 'application/pdf' })
+        const bytes = new Uint8Array(pdfBytes)
+        blob = new Blob([bytes], { type: 'application/pdf' })
         filename = file.name.replace(/\.pdf$/i, '') + '_headers.pdf'
       } else if (utility === 'numbering') {
         const { doc } = await loadPdfDocument(file)
@@ -83,7 +84,7 @@ export default function Utilities() {
 
         for (let i = 0; i < pages.length; i++) {
           const page = pages[i]
-          const { width, height } = page.getSize()
+          const { width } = page.getSize()
           const pageNumber = startNumber + i
 
           let text = ''
@@ -105,7 +106,8 @@ export default function Utilities() {
         }
 
         const pdfBytes = await doc.save()
-        blob = new Blob([pdfBytes], { type: 'application/pdf' })
+        const bytes = new Uint8Array(pdfBytes)
+        blob = new Blob([bytes], { type: 'application/pdf' })
         filename = file.name.replace(/\.pdf$/i, '') + '_numbered.pdf'
       } else if (utility === 'bates') {
         const { doc } = await loadPdfDocument(file)
@@ -128,7 +130,8 @@ export default function Utilities() {
         }
 
         const pdfBytes = await doc.save()
-        blob = new Blob([pdfBytes], { type: 'application/pdf' })
+        const bytes = new Uint8Array(pdfBytes)
+        blob = new Blob([bytes], { type: 'application/pdf' })
         filename = file.name.replace(/\.pdf$/i, '') + '_bates.pdf'
       } else {
         throw new Error('Comparison feature requires advanced implementation')

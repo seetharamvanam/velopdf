@@ -13,7 +13,7 @@ export default function Edit() {
   const [loading, setLoading] = useState(false)
   const [pageNum, setPageNum] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
-  const [rotation, setRotation] = useState(0)
+  const [, setRotation] = useState(0)
   const [selectedTool, setSelectedTool] = useState<'text' | 'annotate' | 'crop' | 'rotate' | 'redact' | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
@@ -79,7 +79,9 @@ export default function Edit() {
     try {
       setLoading(true)
       const pdfBytes = await pdfDoc.save()
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+      // Convert to regular Uint8Array to avoid SharedArrayBuffer type issues
+      const bytes = new Uint8Array(pdfBytes)
+      const blob = new Blob([bytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url

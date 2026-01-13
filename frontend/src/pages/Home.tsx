@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import './Home.css'
 import './ops.css'
@@ -22,8 +22,7 @@ const itemVariants = {
 }
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => { }, [])
 
   return (
     <main className="home-page">
