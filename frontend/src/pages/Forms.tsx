@@ -46,7 +46,7 @@ export default function Forms() {
         // Load PDF and detect form fields
         setStatus({ loading: true, message: 'Loading form...' })
         const arrayBuffer = await f.arrayBuffer()
-        const pdf = await PDFDocument.load(arrayBuffer)
+        await PDFDocument.load(arrayBuffer)
         
         // Extract form fields (simplified - full implementation would enumerate all fields)
         const fields: Record<string, string> = {}
@@ -83,7 +83,9 @@ export default function Forms() {
       // form.getTextField('fieldName').setText(formFields['fieldName'])
       
       const pdfBytes = await pdf.save()
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+      // Convert to regular Uint8Array to avoid SharedArrayBuffer type issues
+      const bytes = new Uint8Array(pdfBytes)
+      const blob = new Blob([bytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       
       setFormFile({ url, name: file.name.replace(/\.pdf$/i, '') + '_filled.pdf', size: blob.size })

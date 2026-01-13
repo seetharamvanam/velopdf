@@ -10,7 +10,6 @@ import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
 import { validateFile, ensurePdfWorker } from '../utils/pdfUtils'
-import { convertPdfToImages } from '../utils/pdfConvert'
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf'
 
 export default function OCR() {
@@ -19,7 +18,6 @@ export default function OCR() {
   const [status, setStatus] = useState<{ loading: boolean; message?: string; progress?: number }>({ loading: false })
   const [extractedText, setExtractedText] = useState<string>('')
   const [language, setLanguage] = useState('eng')
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [tesseractWorker, setTesseractWorker] = useState<any>(null)
 
   useEffect(() => {

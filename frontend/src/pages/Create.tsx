@@ -9,7 +9,7 @@ import Card from '../components/ui/Card'
 import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
-import { createBlankPdf, createPdfFromText, validateFile, downloadBlob } from '../utils/pdfUtils'
+import { createBlankPdf, createPdfFromText, downloadBlob } from '../utils/pdfUtils'
 import { convertImagesToPdf, convertTextToPdf, convertHtmlToPdf } from '../utils/pdfConvert'
 import JSZip from 'jszip'
 
@@ -189,8 +189,8 @@ export default function Create() {
         throw new Error('Failed to create PDF')
       }
 
-      const url = URL.createObjectURL(blob)
-      setCreatedFile({ url, name: filename, size: blob.size })
+      const fileUrl = URL.createObjectURL(blob)
+      setCreatedFile({ url: fileUrl, name: filename, size: blob.size })
       setStatus({ loading: false, message: 'PDF created successfully!' })
       addToast('PDF created successfully!')
     } catch (error: any) {

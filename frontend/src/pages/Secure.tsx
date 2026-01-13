@@ -4,7 +4,7 @@ import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import './PageLayout.css'
 import { useToast } from '../components/ToastProvider'
-import { addPasswordProtection, removePasswordProtection, validateFile, downloadBlob } from '../utils/pdfUtils'
+import { addPasswordProtection, validateFile, downloadBlob } from '../utils/pdfUtils'
 
 export default function Secure() {
   const [file, setFile] = useState<File | null>(null)
@@ -109,7 +109,8 @@ export default function Secure() {
       })
 
       const pdfBytes = await pdf.save()
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+      const bytes = new Uint8Array(pdfBytes)
+      const blob = new Blob([bytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -126,14 +127,7 @@ export default function Secure() {
     }
   }
 
-  async function handleRemovePassword() {
-    if (!file) {
-      showToast('Please select a PDF first', 'warning')
-      return
-    }
-
-    showToast('Password removal requires the PDF password. This feature needs additional implementation.', 'info')
-  }
+  // Password removal functionality reserved for future implementation
 
   return (
     <div className="page-layout">

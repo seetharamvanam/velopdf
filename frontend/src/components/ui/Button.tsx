@@ -3,9 +3,10 @@ import { motion } from 'framer-motion'
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'ghost' | 'secondary'
+  size?: 'sm' | 'md' | 'lg'
 }
 
-export default function Button({ variant = 'primary', className = '', children, ...rest }: Props) {
+export default function Button({ variant = 'primary', size = 'md', className = '', children, ...rest }: Props) {
   const baseClass = 'btn-enterprise'
   const variantClass = variant === 'primary' ? 'primary' : variant === 'ghost' ? 'ghost' : 'secondary'
   const cls = `${baseClass} ${variantClass} ${className}`

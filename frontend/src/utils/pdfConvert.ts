@@ -212,7 +212,8 @@ export async function convertImagesToPdf(
     }
 
     const pdfBytes = await pdf.save()
-    return new Blob([pdfBytes], { type: 'application/pdf' })
+    const bytes = new Uint8Array(pdfBytes)
+    return new Blob([bytes], { type: 'application/pdf' })
   } catch (error: any) {
     throw new Error(`Image to PDF conversion failed: ${error.message || String(error)}`)
   }
@@ -314,7 +315,8 @@ export async function convertTextToPdf(
     }
 
     const pdfBytes = await pdf.save()
-    return new Blob([pdfBytes], { type: 'application/pdf' })
+    const bytes = new Uint8Array(pdfBytes)
+    return new Blob([bytes], { type: 'application/pdf' })
   } catch (error: any) {
     throw new Error(`Text to PDF conversion failed: ${error.message || String(error)}`)
   }

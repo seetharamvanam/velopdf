@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import './MergeBoard.css'
 import { useToast, useAnnounce } from './ToastProvider'
-import { PDFDocument } from 'pdf-lib'
 
 // cached worker setup promise
 let _pdfWorkerSetup: Promise<void> | null = null
@@ -317,7 +316,7 @@ export default function MergeBoard({
       const files = items.map(it => it.file)
       const { mergePdfs, downloadBlob } = await import('../utils/pdfUtils')
       
-      const blob = await mergePdfs(files, (current, total) => {
+      const blob = await mergePdfs(files, () => {
         // Update progress if needed
         if (onMergeComplete) {
           // Could emit progress events here
@@ -325,7 +324,6 @@ export default function MergeBoard({
       })
       
       const filename = 'merged.pdf'
-      const url = URL.createObjectURL(blob)
       
       // Download the merged PDF
       downloadBlob(blob, filename)
