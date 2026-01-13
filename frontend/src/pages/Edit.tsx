@@ -2,9 +2,20 @@ import { useState, useRef, useEffect } from 'react'
 import * as pdfLib from 'pdf-lib'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import PdfViewer from '../components/PdfViewer'
+import PdfEditorCanvas from '../components/PdfEditorCanvas'
 import './PageLayout.css'
 import { useToast } from '../components/ToastProvider'
+
+type DrawingTool = 'pen' | 'highlight' | 'rectangle' | 'circle' | 'arrow' | 'text' | 'eraser' | 'select'
+type DrawingAction = {
+  tool: DrawingTool
+  points: Array<{ x: number; y: number }>
+  color: string
+  strokeWidth: number
+  fill?: boolean
+  text?: string
+  fontSize?: number
+}
 
 export default function Edit() {
   const [file, setFile] = useState<File | null>(null)
@@ -12,9 +23,10 @@ export default function Edit() {
   const [pdfDoc, setPdfDoc] = useState<pdfLib.PDFDocument | null>(null)
   const [loading, setLoading] = useState(false)
   const [pageNum, setPageNum] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
-  const [, setRotation] = useState(0)
-  const [selectedTool, setSelectedTool] = useState<'text' | 'annotate' | 'crop' | 'rotate' | 'redact' | null>(null)
+  const [selectedTool, setSelectedTool] = useState<DrawingTool>('select')
+  const [toolColor, setToolColor] = useState('#000000')
+  const [toolStrokeWidth, setToolStrokeWidth] = useState(2)
+  const [drawings, setDrawings] = useState<DrawingAction[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
@@ -28,7 +40,6 @@ export default function Edit() {
       const pdf = await pdfLib.PDFDocument.load(arrayBuffer)
       setPdfDoc(pdf)
       setFile(selectedFile)
-      setTotalPages(pdf.getPageCount())
       setPageNum(1)
       
       // Create object URL for PdfViewer
@@ -52,26 +63,6 @@ export default function Edit() {
       }
     }
   }, [fileUrl])
-
-  async function handleRotate(direction: 'left' | 'right') {
-    if (!pdfDoc) return
-
-    try {
-      setLoading(true)
-      const pages = pdfDoc.getPages()
-      const currentPage = pages[pageNum - 1]
-      const currentRotation = currentPage.getRotation()
-      const angle = direction === 'right' ? 90 : -90
-      const newRotation = (currentRotation.angle + angle) % 360
-      currentPage.setRotation(pdfLib.degrees(newRotation))
-      setRotation(newRotation)
-      showToast(`Page rotated ${direction === 'right' ? 'right' : 'left'}`, 'success')
-    } catch (error) {
-      showToast('Failed to rotate page', 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function handleDownload() {
     if (!pdfDoc || !file) return
@@ -149,90 +140,119 @@ export default function Edit() {
           <div className="editor-toolbar">
             <div className="toolbar-group">
               <Button
+                variant={selectedTool === 'pen' ? 'primary' : 'ghost'}
+                onClick={() => setSelectedTool(selectedTool === 'pen' ? 'select' : 'pen')}
+                title="Pen - Draw freehand"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                  <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                  <path d="M2 2l7.586 7.586" />
+                  <circle cx="11" cy="11" r="2" />
+                </svg>
+                Pen
+              </Button>
+              <Button
+                variant={selectedTool === 'highlight' ? 'primary' : 'ghost'}
+                onClick={() => setSelectedTool(selectedTool === 'highlight' ? 'select' : 'highlight')}
+                title="Highlight - Highlight text"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M3 12h18M6 8h12M6 16h12" strokeWidth="2" />
+                </svg>
+                Highlight
+              </Button>
+              <Button
+                variant={selectedTool === 'rectangle' ? 'primary' : 'ghost'}
+                onClick={() => setSelectedTool(selectedTool === 'rectangle' ? 'select' : 'rectangle')}
+                title="Rectangle - Draw rectangle"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                </svg>
+                Rectangle
+              </Button>
+              <Button
+                variant={selectedTool === 'circle' ? 'primary' : 'ghost'}
+                onClick={() => setSelectedTool(selectedTool === 'circle' ? 'select' : 'circle')}
+                title="Circle - Draw circle"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
+                Circle
+              </Button>
+              <Button
+                variant={selectedTool === 'arrow' ? 'primary' : 'ghost'}
+                onClick={() => setSelectedTool(selectedTool === 'arrow' ? 'select' : 'arrow')}
+                title="Arrow - Draw arrow"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+                Arrow
+              </Button>
+              <Button
                 variant={selectedTool === 'text' ? 'primary' : 'ghost'}
-                onClick={() => setSelectedTool(selectedTool === 'text' ? null : 'text')}
+                onClick={() => setSelectedTool(selectedTool === 'text' ? 'select' : 'text')}
+                title="Text - Add text"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="M4 20h16M6 16V4h4a4 4 0 0 1 4 4v8" />
                   <path d="M18 16V8h-4" />
                 </svg>
-                Text Edit
+                Text
               </Button>
               <Button
-                variant={selectedTool === 'annotate' ? 'primary' : 'ghost'}
-                onClick={() => setSelectedTool(selectedTool === 'annotate' ? null : 'annotate')}
+                variant={selectedTool === 'eraser' ? 'primary' : 'ghost'}
+                onClick={() => setSelectedTool(selectedTool === 'eraser' ? 'select' : 'eraser')}
+                title="Eraser - Erase drawings"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
+                  <line x1="18" y1="9" x2="12" y2="15" />
+                  <line x1="12" y1="9" x2="18" y2="15" />
                 </svg>
-                Annotate
-              </Button>
-              <Button
-                variant={selectedTool === 'crop' ? 'primary' : 'ghost'}
-                onClick={() => setSelectedTool(selectedTool === 'crop' ? null : 'crop')}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M6 2v4M6 18v4M2 6h4M18 6h4" />
-                  <rect x="8" y="8" width="8" height="8" />
-                </svg>
-                Crop
-              </Button>
-              <Button
-                variant={selectedTool === 'rotate' ? 'primary' : 'ghost'}
-                onClick={() => setSelectedTool(selectedTool === 'rotate' ? null : 'rotate')}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-                </svg>
-                Rotate
-              </Button>
-              <Button
-                variant={selectedTool === 'redact' ? 'primary' : 'ghost'}
-                onClick={() => setSelectedTool(selectedTool === 'redact' ? null : 'redact')}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <line x1="9" y1="9" x2="15" y2="15" />
-                </svg>
-                Redact
+                Eraser
               </Button>
             </div>
 
             <div className="toolbar-group">
-              <Button variant="ghost" onClick={() => handleRotate('left')} disabled={!pdfDoc || loading}>
-                ↺ Rotate Left
-              </Button>
-              <Button variant="ghost" onClick={() => handleRotate('right')} disabled={!pdfDoc || loading}>
-                ↻ Rotate Right
-              </Button>
-            </div>
-
-            <div className="toolbar-group">
-              <span className="page-info">
-                Page {pageNum} of {totalPages}
-              </span>
-              <Button
-                variant="ghost"
-                onClick={() => setPageNum(Math.max(1, pageNum - 1))}
-                disabled={pageNum === 1}
-              >
-                ←
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setPageNum(Math.min(totalPages, pageNum + 1))}
-                disabled={pageNum === totalPages}
-              >
-                →
-              </Button>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Color:
+                <input
+                  type="color"
+                  value={toolColor}
+                  onChange={(e) => setToolColor(e.target.value)}
+                  style={{ width: '40px', height: '32px', border: '1px solid var(--border-primary)', borderRadius: '4px', cursor: 'pointer' }}
+                />
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Size:
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={toolStrokeWidth}
+                  onChange={(e) => setToolStrokeWidth(Number(e.target.value))}
+                  style={{ width: '80px' }}
+                />
+                <span style={{ minWidth: '30px', textAlign: 'center' }}>{toolStrokeWidth}</span>
+              </label>
             </div>
           </div>
 
           <div className="editor-viewer">
             {fileUrl && (
-              <PdfViewer
-                src={fileUrl}
-                filename={file?.name || 'Document'}
+              <PdfEditorCanvas
+                pdfSrc={fileUrl}
+                currentPage={pageNum}
+                onPageChange={setPageNum}
+                selectedTool={selectedTool}
+                toolColor={toolColor}
+                toolStrokeWidth={toolStrokeWidth}
+                drawings={drawings}
+                onDrawingChange={setDrawings}
               />
             )}
             {!fileUrl && file && (
