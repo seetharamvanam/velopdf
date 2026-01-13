@@ -1136,3 +1136,95 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] .feature-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .visual-card {
+  background: rgba(15, 20, 25, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-xl), 0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .visual-card:hover {
+  box-shadow: var(--shadow-2xl), 0 0 60px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .stat-card {
+  background: rgba(15, 20, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .feature-card {
+  background: rgba(26, 31, 46, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .feature-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .features-cta {
+  background: rgba(26, 31, 46, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .step-content {
+  background: rgba(26, 31, 46, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .workflow-step:hover .step-content {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .demo-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+[data-theme="dark"] .demo-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .footer-newsletter {
+  background: rgba(26, 31, 46, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .newsletter-input {
+  background: rgba(15, 20, 25, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .newsletter-input:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.3);
+}
+
+[data-theme="dark"] .newsletter-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .social-link {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .social-link:hover {
+  background: var(--gradient-primary);
+}
+
+[data-theme="dark"] .badge {
+  background: rgba(255, 255, 255, 0.05);
+}

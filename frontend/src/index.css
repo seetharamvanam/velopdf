@@ -13,11 +13,6 @@
 
   color-scheme: light;
   text-rendering: optimizeLegibility;
-  
-  /* Light theme defaults */
-  --bg-primary: #ffffff;
-  --text-primary: #000000;
-  --border-primary: #e5e5e5;
 }
 
 body {
@@ -35,18 +30,8 @@ body {
   color-scheme: dark;
 }
 
-[data-theme="dark"] body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-}
-
 [data-theme="light"] {
   color-scheme: light;
-}
-
-[data-theme="light"] body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
 }
 
 .no-scroll { overflow: hidden }
