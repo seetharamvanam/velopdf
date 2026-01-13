@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Use a relative base so builds work when deployed under a sub-path (e.g. GitHub Pages project sites)
-  base: './',
+  // Use absolute base for Vercel deployment
+  base: '/',
   plugins: [react(), tailwindcss()],
   server: {
     host: '0.0.0.0', // Listen on all network interfaces
