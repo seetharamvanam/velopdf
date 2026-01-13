@@ -3,7 +3,7 @@
  * All operations run entirely in the browser without server dependencies
  */
 
-import { PDFDocument, PDFFont, rgb, StandardFonts } from 'pdf-lib'
+import { PDFDocument, PDFFont, rgb, StandardFonts, degrees } from 'pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf'
 // @ts-ignore - file-saver doesn't have type definitions
 import { saveAs } from 'file-saver'
@@ -208,8 +208,8 @@ export async function extractPages(
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const sourcePdf = await PDFDocument.load(bytes, { ignoreEncryption: false })
+    const fileBytes = new Uint8Array(arrayBuffer)
+    const sourcePdf = await PDFDocument.load(fileBytes, { ignoreEncryption: false })
     const totalPages = sourcePdf.getPageCount()
     
     // Validate and convert to 0-based indices
@@ -228,8 +228,8 @@ export async function extractPages(
     if (onProgress) onProgress(1, 1)
     
     const pdfBytes = await newPdf.save()
-    const bytes = new Uint8Array(pdfBytes)
-    return new Blob([bytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password')) {
       throw new Error('PDF is password-protected. Please unlock it first.')
@@ -252,8 +252,8 @@ export async function reorderPages(
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const sourcePdf = await PDFDocument.load(bytes, { ignoreEncryption: false })
+    const fileBytes = new Uint8Array(arrayBuffer)
+    const sourcePdf = await PDFDocument.load(fileBytes, { ignoreEncryption: false })
     const totalPages = sourcePdf.getPageCount()
     
     // Validate new order
@@ -274,8 +274,8 @@ export async function reorderPages(
     copiedPages.forEach((page) => newPdf.addPage(page))
     
     const pdfBytes = await newPdf.save()
-    const bytes = new Uint8Array(pdfBytes)
-    return new Blob([bytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password')) {
       throw new Error('PDF is password-protected. Please unlock it first.')
@@ -300,8 +300,8 @@ export async function rotatePages(
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const pdf = await PDFDocument.load(bytes, { ignoreEncryption: false })
+    const fileBytes = new Uint8Array(arrayBuffer)
+    const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: false })
     const totalPages = pdf.getPageCount()
     
     const pageIndices = pageNumbers
@@ -317,12 +317,12 @@ export async function rotatePages(
       const page = pdf.getPage(pageIndex)
       const currentRotation = page.getRotation().angle
       const newRotation = ((rotation + currentRotation) % 360) as 0 | 90 | 180 | 270
-      page.setRotation(newRotation)
+      page.setRotation(degrees(newRotation))
     })
     
     const pdfBytes = await pdf.save()
-    const bytes = new Uint8Array(pdfBytes)
-    return new Blob([bytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password')) {
       throw new Error('PDF is password-protected. Please unlock it first.')
@@ -345,8 +345,8 @@ export async function deletePages(
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const pdf = await PDFDocument.load(bytes, { ignoreEncryption: false })
+    const fileBytes = new Uint8Array(arrayBuffer)
+    const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: false })
     const totalPages = pdf.getPageCount()
     
     // Sort in descending order to avoid index shifting issues
@@ -368,8 +368,8 @@ export async function deletePages(
     })
     
     const pdfBytes = await pdf.save()
-    const bytes = new Uint8Array(pdfBytes)
-    return new Blob([bytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password')) {
       throw new Error('PDF is password-protected. Please unlock it first.')
@@ -441,8 +441,8 @@ export async function cropPage(
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const pdf = await PDFDocument.load(bytes, { ignoreEncryption: false })
+    const fileBytes = new Uint8Array(arrayBuffer)
+    const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: false })
     const totalPages = pdf.getPageCount()
     
     if (pageNumber > totalPages) {
@@ -462,8 +462,8 @@ export async function cropPage(
     page.setCropBox(cropBox.x, cropBox.y, cropBox.width, cropBox.height)
     
     const pdfBytes = await pdf.save()
-    const bytes = new Uint8Array(pdfBytes)
-    return new Blob([bytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password')) {
       throw new Error('PDF is password-protected. Please unlock it first.')
@@ -478,8 +478,8 @@ export async function cropPage(
 export async function addPasswordProtection(
   file: File,
   userPassword: string,
-  ownerPassword?: string,
-  permissions?: {
+  _ownerPassword?: string,
+  _permissions?: {
     printing?: boolean
     modifying?: boolean
     copying?: boolean
@@ -498,30 +498,18 @@ export async function addPasswordProtection(
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const pdf = await PDFDocument.load(bytes, { ignoreEncryption: false })
-    
-    const finalOwnerPassword = ownerPassword || userPassword
-    
-    // PDF-lib uses permissions flags (set to false to allow)
-    const flags = {
-      print: !permissions?.printing,
-      modify: !permissions?.modifying,
-      copy: !permissions?.copying,
-      annotate: !permissions?.annotating,
-      fillForms: !permissions?.fillingForms,
-      contentAccessibility: !permissions?.contentAccessibility,
-      assemble: !permissions?.documentAssembly,
-    }
+    const fileBytes = new Uint8Array(arrayBuffer)
+    const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: false })
     
     // Note: pdf-lib encryption is done via save() options, not a separate encrypt() method
+    // Password protection and encryption are not fully supported in this version of pdf-lib
     const pdfBytes = await pdf.save({
       useObjectStreams: false,
       // Encryption options would go here if supported by pdf-lib version
       // For now, encryption is not fully supported in this version
     })
-    const bytes = new Uint8Array(pdfBytes)
-    return new Blob([bytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password') && error.message?.includes('required')) {
       throw new Error('PDF is password-protected. Please unlock it first.')
@@ -566,7 +554,8 @@ export async function removePasswordProtection(
     } catch {}
     
     const pdfBytes = await newPdf.save()
-    return new Blob([pdfBytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password') || error.name === 'PDFPasswordException') {
       throw new Error('Incorrect password')
@@ -587,10 +576,10 @@ export async function compressPdf(
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
+    const fileBytes = new Uint8Array(arrayBuffer)
     
     // pdf-lib doesn't have built-in compression, but we can use save options
-    const pdf = await PDFDocument.load(bytes, { ignoreEncryption: false })
+    const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: false })
     
     // Quality settings affect file size
     const saveOptions: any = {
@@ -602,8 +591,8 @@ export async function compressPdf(
     }
     
     const pdfBytes = await pdf.save(saveOptions)
-    const bytes = new Uint8Array(pdfBytes)
-    return new Blob([bytes], { type: 'application/pdf' })
+    const pdfBytesArray = new Uint8Array(pdfBytes)
+    return new Blob([pdfBytesArray], { type: 'application/pdf' })
   } catch (error: any) {
     if (error.message?.includes('password')) {
       throw new Error('PDF is password-protected. Please unlock it first.')

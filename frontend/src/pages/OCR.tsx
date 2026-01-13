@@ -3,7 +3,7 @@
  * Convert scanned PDFs or images to editable/searchable text
  */
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import './PageLayout.css'

@@ -50,7 +50,7 @@ export default function Utilities() {
 
         for (let i = 0; i < pages.length; i++) {
           const page = pages[i]
-          const { width, height } = page.getSize()
+          const { height } = page.getSize()
 
           if (headerText) {
             page.drawText(headerText, {

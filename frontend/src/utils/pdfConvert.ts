@@ -379,7 +379,6 @@ export async function extractImagesFromPdf(
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
       const page = await pdfDoc.getPage(pageNum)
-      const operators = await page.getOperatorList()
 
       // Extract images from operators (simplified approach)
       // Note: This is a basic implementation. Full image extraction is complex.
