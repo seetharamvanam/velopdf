@@ -110,23 +110,6 @@ export default function Split() {
     }
   }
 
-  async function extractFilesFromZip(zipBlob: Blob): Promise<{ name: string; blob: Blob }[]> {
-    const JSZip = (await import('jszip')).default
-    const zip = await JSZip.loadAsync(zipBlob)
-    const filePromises: Promise<{ name: string; blob: Blob }>[] = []
-    
-    zip.forEach((relativePath, file) => {
-      if (!file.dir) {
-        filePromises.push(
-          file.async('blob').then(blob => ({ name: relativePath, blob }))
-        )
-      }
-    })
-    
-    const files = await Promise.all(filePromises)
-    return files
-  }
-
   async function handleSplit() {
     if (!file) return
     if (!numPages) return
@@ -146,36 +129,6 @@ export default function Split() {
     }
     setStatus({ loading: true, message: 'Splitting...' })
     
-    try {
-      const form = new FormData()
-      form.append('file', file, file.name)
-      const rangesStr = ranges.map(r => `${r.start}-${r.end}`).join(',')
-      form.append('ranges', rangesStr)
-
-      const res = await fetch('/api/split/ranges', {
-        method: 'POST',
-        body: form,
-      })
-
-      if (res.ok) {
-        const zipBlob = await res.blob()
-        if (zipBlob && zipBlob.size > 100 && (zipBlob.type === 'application/zip' || zipBlob.type === 'application/octet-stream')) {
-          try {
-            const extractedFiles = await extractFilesFromZip(zipBlob)
-            processSplitResults(extractedFiles, false)
-            return
-          } catch (zipErr) {
-            console.warn('Failed to extract ZIP, falling back to client-side', zipErr)
-          }
-        }
-      } else {
-        const txt = await res.text().catch(() => 'Split failed')
-        console.warn('Backend split failed, falling back to client-side:', txt)
-      }
-    } catch (apiErr) {
-      console.warn('Backend API call failed, falling back to client-side:', apiErr)
-    }
-
     try {
       const outputs = await splitPdfByRanges(file, ranges, (done, total) => setStatus({ loading: true, message: `Processing ${done}/${total}` }))
       processSplitResults(outputs, true)
@@ -311,34 +264,6 @@ export default function Split() {
     if (!file || !numPages) return
     setStatus({ loading: true, message: 'Splitting to pages...' })
     
-    try {
-      const form = new FormData()
-      form.append('file', file, file.name)
-
-      const res = await fetch('/api/split/pages', {
-        method: 'POST',
-        body: form,
-      })
-
-      if (res.ok) {
-        const zipBlob = await res.blob()
-        if (zipBlob && zipBlob.size > 100 && (zipBlob.type === 'application/zip' || zipBlob.type === 'application/octet-stream')) {
-          try {
-            const extractedFiles = await extractFilesFromZip(zipBlob)
-            processSplitResults(extractedFiles, false)
-            return
-          } catch (zipErr) {
-            console.warn('Failed to extract ZIP, falling back to client-side', zipErr)
-          }
-        }
-      } else {
-        const txt = await res.text().catch(() => 'Split failed')
-        console.warn('Backend split failed, falling back to client-side:', txt)
-      }
-    } catch (apiErr) {
-      console.warn('Backend API call failed, falling back to client-side:', apiErr)
-    }
-
     try {
       const ranges = Array.from({ length: numPages }, (_, i) => ({ start: i + 1, end: i + 1 }))
       const outputs = await splitPdfByRanges(file, ranges, (done, total) => setStatus({ loading: true, message: `Processing ${done}/${total}` }))
