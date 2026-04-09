@@ -1,7 +1,14 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 
-export default function Card({ children, className = '', delay = 0, style }: { children: React.ReactNode; className?: string; delay?: number; style?: React.CSSProperties }) {
+type CardProps = React.HTMLAttributes<HTMLElement> & {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  style?: React.CSSProperties;
+}
+
+export default function Card({ children, className = '', delay = 0, style, ...rest }: CardProps) {
   return (
     <motion.article 
       initial={{ opacity: 0, y: 20 }}
@@ -11,6 +18,7 @@ export default function Card({ children, className = '', delay = 0, style }: { c
       whileHover={{ y: -5, boxShadow: 'var(--shadow-xl)' }}
       className={`card ${className}`}
       style={style}
+      {...rest}
     >
       {children}
     </motion.article>
