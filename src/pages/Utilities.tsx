@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import UploadZone from '../components/UploadZone'
 import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
@@ -30,6 +31,16 @@ export default function Utilities() {
   // Bates Numbering
   const [batesPrefix, setBatesPrefix] = useState('')
   const [batesStartNumber, setBatesStartNumber] = useState(1)
+
+  function handleFile(f: File) {
+    const validation = validateFile(f)
+    if (validation.valid) {
+      setFile(f)
+      setResultFile(null)
+    } else {
+      addToast(validation.error || 'Invalid file')
+    }
+  }
   
   // Compare
   // const [file2, setFile2] = useState<File | null>(null) // Reserved for future use
@@ -208,19 +219,11 @@ export default function Utilities() {
       {utility !== 'compare' && (
         <>
           {!file ? (
-            <Card className="upload-zone">
-              <div className="upload-content">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                <h3>Upload a PDF</h3>
-                <Button variant="secondary" onClick={() => (document.getElementById('utilities-upload') as HTMLInputElement | null)?.click()}>
-                  Select File
-                </Button>
-              </div>
-            </Card>
+            <UploadZone
+              title="Upload a PDF"
+              inputId="utilities-upload"
+              onFile={handleFile}
+            />
           ) : (
             <Card className="card-padding">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
@@ -353,19 +356,7 @@ export default function Utilities() {
         className="sr-only"
         type="file"
         accept="application/pdf"
-        onChange={(e) => {
-          const f = e.target.files?.[0]
-          if (f) {
-            const validation = validateFile(f)
-            if (validation.valid) {
-              setFile(f)
-              setResultFile(null)
-            } else {
-              addToast(validation.error || 'Invalid file')
-            }
-          }
-          e.target.value = ''
-        }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
       />
     </div>
   )

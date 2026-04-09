@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import PdfViewer from '../components/PdfViewer'
+import UploadZone from '../components/UploadZone'
+import PdfPreviewModal from '../components/PdfPreviewModal'
 import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
+import { formatFileSize } from '../utils/pdfUtils'
 
 function parseRanges(input: string, total: number) {
   const cleaned = (input || '').trim()
@@ -56,8 +58,6 @@ export default function Split() {
   const [rangesText, setRangesText] = useState('')
   const [status, setStatus] = useState<{ loading: boolean; message?: string }>({ loading: false })
   const [results, setResults] = useState<{ name: string; url: string; size: number }[]>([])
-  const [dragging, setDragging] = useState(false)
-
   const thumbsRef = React.useRef<HTMLDivElement | null>(null)
   const renderTasksRef = React.useRef<any[]>([])
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -348,31 +348,19 @@ export default function Split() {
     updateAllCanvasStyles(new Set())
   }
 
-  function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return bytes + ' B'
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
+  function closePreview() {
+    setPreviewOpen(false)
+    setTimeout(() => { if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) } }, 80)
   }
 
   return (
     <div className="page-layout">
-      {previewOpen && previewUrl && (
-        <div className="pdf-preview-overlay" role="dialog" aria-label="PDF preview">
-          <div className="pdf-preview-backdrop" onClick={() => { setPreviewOpen(false); setTimeout(()=>{ if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) } }, 80) }} />
-          <div className="pdf-preview-popup" style={{ width: '86vw', maxWidth: 1100 }}>
-            <div className="pdf-preview-header">
-              <div className="pdf-preview-title">Preview</div>
-              <div className="pdf-preview-meta">Previewing file</div>
-              <button className="btn small" onClick={() => { setPreviewOpen(false); if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) } }} aria-label="Close preview">✕</button>
-            </div>
-            <div className="pdf-preview-body">
-              <div style={{ width: '100%', height: '70vh' }}>
-                <PdfViewer src={previewUrl} filename={file?.name} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <PdfPreviewModal
+        open={previewOpen}
+        url={previewUrl}
+        filename={file?.name}
+        onClose={closePreview}
+      />
 
       <div className="page-header">
         <div>
@@ -406,32 +394,11 @@ export default function Split() {
       </div>
 
       {!file ? (
-        <Card
-          className={`upload-zone${dragging ? ' upload-zone--dragging' : ''}`}
-          onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-          onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false) }}
-          onDrop={(e) => {
-            e.preventDefault()
-            setDragging(false)
-            const dropped = e.dataTransfer.files?.[0]
-            if (dropped) onFileChange(dropped)
-          }}
-          onClick={() => (document.getElementById('split-upload') as HTMLInputElement | null)?.click()}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className="upload-content">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <h3>{dragging ? 'Drop your PDF here' : 'Upload a PDF to Split'}</h3>
-            <p>Drag and drop your PDF here, or click to browse</p>
-            <Button variant="secondary" onClick={(e) => { e.stopPropagation(); (document.getElementById('split-upload') as HTMLInputElement | null)?.click() }}>
-              Select File
-            </Button>
-          </div>
-        </Card>
+        <UploadZone
+          title="Upload a PDF to Split"
+          inputId="split-upload"
+          onFile={onFileChange}
+        />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           <Card className="card-padding">

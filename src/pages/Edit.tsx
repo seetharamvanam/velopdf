@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import * as pdfLib from 'pdf-lib'
 import Button from '../components/ui/Button'
-import Card from '../components/ui/Card'
+import UploadZone from '../components/UploadZone'
 import PdfEditorCanvas from '../components/PdfEditorCanvas'
 import './PageLayout.css'
 import { useToast } from '../components/ToastProvider'
@@ -27,11 +27,9 @@ export default function Edit() {
   const [toolColor, setToolColor] = useState('#000000')
   const [toolStrokeWidth, setToolStrokeWidth] = useState(2)
   const [drawings, setDrawings] = useState<DrawingAction[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
-  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const selectedFile = e.target.files?.[0]
+  async function handleFile(selectedFile: File) {
     if (!selectedFile) return
 
     try {
@@ -100,7 +98,7 @@ export default function Edit() {
           {!file ? (
             <Button
               variant="primary"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => (document.getElementById('edit-upload') as HTMLInputElement | null)?.click()}
               disabled={loading}
             >
               Upload PDF
@@ -111,30 +109,21 @@ export default function Edit() {
             </Button>
           )}
           <input
-            ref={fileInputRef}
+            id="edit-upload"
             type="file"
             accept="application/pdf"
             className="sr-only"
-            onChange={handleFileSelect}
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.currentTarget.value = '' }}
           />
         </div>
       </div>
 
       {!file ? (
-        <Card className="upload-zone">
-          <div className="upload-content">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <h3>Upload a PDF to Edit</h3>
-            <p>Drag and drop your PDF here, or click to browse</p>
-            <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-              Select File
-            </Button>
-          </div>
-        </Card>
+        <UploadZone
+          title="Upload a PDF to Edit"
+          inputId="edit-upload"
+          onFile={handleFile}
+        />
       ) : (
         <div className="editor-container">
           <div className="editor-toolbar">

@@ -1,14 +1,18 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 
-type CardProps = React.HTMLAttributes<HTMLElement> & {
+type CardProps = {
   children: React.ReactNode;
   className?: string;
   delay?: number;
   style?: React.CSSProperties;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+  onDragOver?: React.DragEventHandler<HTMLElement>;
+  onDragLeave?: React.DragEventHandler<HTMLElement>;
+  onDrop?: React.DragEventHandler<HTMLElement>;
 }
 
-export default function Card({ children, className = '', delay = 0, style, ...rest }: CardProps) {
+export default function Card({ children, className = '', delay = 0, style, onClick, onDragOver, onDragLeave, onDrop }: CardProps) {
   return (
     <motion.article 
       initial={{ opacity: 0, y: 20 }}
@@ -18,7 +22,10 @@ export default function Card({ children, className = '', delay = 0, style, ...re
       whileHover={{ y: -5, boxShadow: 'var(--shadow-xl)' }}
       className={`card ${className}`}
       style={style}
-      {...rest}
+      onClick={onClick}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
     >
       {children}
     </motion.article>

@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import UploadZone from '../components/UploadZone'
 import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
@@ -298,24 +299,18 @@ export default function OCR() {
       </Card>
 
       {!file ? (
-        <Card className="upload-zone">
-          <div className="upload-content">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <h3>Upload PDF or Image for OCR</h3>
-            <p>Drag and drop a PDF or image file here, or click to browse</p>
-            <Button variant="secondary" onClick={() => (document.getElementById('ocr-upload') as HTMLInputElement | null)?.click()}>
-              Select File
-            </Button>
-            <div style={{ marginTop: 16, fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>
-              Supported: PDF, PNG, JPG, JPEG, GIF, WEBP, BMP<br />
-              Maximum file size: 50MB
-            </div>
+        <UploadZone
+          title="Upload PDF or Image for OCR"
+          inputId="ocr-upload"
+          onFile={onFileChange}
+          subtitle="Drag and drop a PDF or image file here, or click to browse"
+          accept="application/pdf,image/*"
+        >
+          <div style={{ marginTop: 16, fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>
+            Supported: PDF, PNG, JPG, JPEG, GIF, WEBP, BMP<br />
+            Maximum file size: 50MB
           </div>
-        </Card>
+        </UploadZone>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           <Card className="card-padding">

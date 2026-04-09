@@ -9,7 +9,7 @@ import Card from '../components/ui/Card'
 import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
-import { createBlankPdf, createPdfFromText, downloadBlob } from '../utils/pdfUtils'
+import { createBlankPdf, createPdfFromText, downloadBlob, formatFileSize } from '../utils/pdfUtils'
 import { convertImagesToPdf, convertTextToPdf, convertHtmlToPdf } from '../utils/pdfConvert'
 import JSZip from 'jszip'
 
@@ -251,11 +251,6 @@ export default function Create() {
     }
   }
 
-  function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return bytes + ' B'
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
-  }
 
   return (
     <div className="page-layout">
