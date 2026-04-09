@@ -1,5 +1,6 @@
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import UploadZone from '../components/UploadZone'
 import React from 'react'
 import './PageLayout.css'
 import './ops.css'
@@ -9,7 +10,6 @@ import { useToast } from '../components/ToastProvider'
 export default function Merge() {
   const [files, setFiles] = React.useState<File[]>([])
   const [merged, setMerged] = React.useState(false)
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
   function handleFilesChange(next: File[]) {
@@ -31,13 +31,13 @@ export default function Merge() {
           {files.length === 0 ? (
             <Button
               variant="primary"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => (document.getElementById('merge-upload') as HTMLInputElement | null)?.click()}
             >
               Upload PDFs to Merge
             </Button>
           ) : null}
           <input
-            ref={fileInputRef}
+            id="merge-upload"
             type="file"
             accept="application/pdf"
             multiple
@@ -55,20 +55,18 @@ export default function Merge() {
       </div>
 
       {files.length === 0 ? (
-        <Card className="upload-zone">
-          <div className="upload-content">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <h3>Upload PDFs to Merge</h3>
-            <p>Drag and drop your PDF files here, or click to browse</p>
-            <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-              Select Files
-            </Button>
-          </div>
-        </Card>
+        <UploadZone
+          title="Upload PDFs to Merge"
+          inputId="merge-upload"
+          onFiles={(added) => {
+            if (added.length) {
+              handleFilesChange([...(files || []), ...added])
+              showToast(`${added.length} file(s) added`, 'success')
+            }
+          }}
+          subtitle="Drag and drop your PDF files here, or click to browse"
+          multiple
+        />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           <div className="merge-helper">

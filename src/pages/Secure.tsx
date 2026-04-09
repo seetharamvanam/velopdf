@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import * as pdfLib from 'pdf-lib'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import UploadZone from '../components/UploadZone'
 import './PageLayout.css'
 import { useToast } from '../components/ToastProvider'
 import { addPasswordProtection, validateFile, downloadBlob } from '../utils/pdfUtils'
@@ -20,15 +21,11 @@ export default function Secure() {
   })
   const [watermarkText, setWatermarkText] = useState('')
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.3)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
-  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const selectedFile = e.target.files?.[0]
-    if (selectedFile) {
-      setFile(selectedFile)
-      showToast('PDF loaded', 'success')
-    }
+  function handleFile(selectedFile: File) {
+    setFile(selectedFile)
+    showToast('PDF loaded', 'success')
   }
 
   async function handlePasswordProtect() {
@@ -140,14 +137,14 @@ export default function Secure() {
         </div>
         <div className="page-actions">
           <input
-            ref={fileInputRef}
+            id="secure-upload"
             type="file"
             accept="application/pdf"
             className="sr-only"
-            onChange={handleFileSelect}
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.currentTarget.value = '' }}
           />
           {!file ? (
-            <Button variant="primary" onClick={() => fileInputRef.current?.click()}>
+            <Button variant="primary" onClick={() => (document.getElementById('secure-upload') as HTMLInputElement | null)?.click()}>
               Upload PDF
             </Button>
           ) : (
@@ -159,20 +156,11 @@ export default function Secure() {
       </div>
 
       {!file ? (
-        <Card className="upload-zone">
-          <div className="upload-content">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <h3>Upload a PDF to Secure</h3>
-            <p>Drag and drop your PDF here, or click to browse</p>
-            <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-              Select File
-            </Button>
-          </div>
-        </Card>
+        <UploadZone
+          title="Upload a PDF to Secure"
+          inputId="secure-upload"
+          onFile={handleFile}
+        />
       ) : (
         <Card className="card-padding">
           <div style={{ marginBottom: 'var(--space-4)' }}>

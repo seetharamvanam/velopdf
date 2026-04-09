@@ -98,8 +98,7 @@ export default function MergeBoard({
 
   const onFiles = useCallback((files: FileList | File[]) => {
     const arr = Array.from(files as any as File[])
-    console.log('[MergeBoard] adding files', arr.map(a => a.name))
-    const newItems = arr.map((f) => ({ id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`, file: f }))
+        const newItems = arr.map((f) => ({ id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`, file: f }))
     if (propsFiles && onFilesChange) {
       // controlled mode: delegate to parent
       onFilesChange([...propsFiles, ...arr])
@@ -133,10 +132,8 @@ export default function MergeBoard({
 
   // Generate a thumbnail for a PDF file (first page) with retries and error state
   async function generateThumbnail(file: File, id: string, opts?: { force?: boolean }) {
-    console.log('[MergeBoard] generateThumbnail start', id, file.name)
     // avoid double work
     if (thumbLoading[id] && !opts?.force) {
-      console.log('[MergeBoard] thumbnail already loading', id)
       return
     }
 
@@ -175,7 +172,6 @@ export default function MergeBoard({
           await renderTask.promise
           const data = canvas.toDataURL('image/png')
           setThumbnails((s) => ({ ...s, [id]: data }))
-          console.log('[MergeBoard] thumbnail ready', id)
           // success — clear any error state
           setThumbError((s) => ({ ...s, [id]: null }))
           success = true
@@ -214,7 +210,6 @@ export default function MergeBoard({
     function onAdd(e: Event) {
       const ce = e as CustomEvent<File[]>
       const files = ce?.detail || []
-      console.log('[MergeBoard] received mergeboard-add', files && (files as any).length)
       if (!files || !files.length) return
       onFiles(files)
     }
@@ -227,7 +222,6 @@ export default function MergeBoard({
     function onAddFiles(e: Event) {
       const ce = e as CustomEvent<File[]>
       const files = ce?.detail || []
-      console.log('[MergeBoard] received merge-add-files', files && (files as any).length)
       if (!files || !files.length) return
       onFiles(files)
     }

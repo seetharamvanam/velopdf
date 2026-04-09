@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import PdfViewer from '../components/PdfViewer'
+import UploadZone from '../components/UploadZone'
+import PdfPreviewModal from '../components/PdfPreviewModal'
 import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
-import { compressPdf, validateFile, downloadBlob } from '../utils/pdfUtils'
+import { compressPdf, validateFile, downloadBlob, formatFileSize } from '../utils/pdfUtils'
 
 export default function Compress() {
   const { addToast } = useToast()
@@ -15,7 +16,6 @@ export default function Compress() {
   const [compressedFile, setCompressedFile] = useState<{ url: string; size: number; originalSize: number } | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
   useEffect(() => {
     return () => {
       if (compressedFile) URL.revokeObjectURL(compressedFile.url)
@@ -99,31 +99,20 @@ export default function Compress() {
     }
   }
 
-  function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return bytes + ' B'
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
+  function closePreview() {
+    setPreviewOpen(false)
+    setTimeout(() => { if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) } }, 80)
   }
 
   return (
     <div className="page-layout">
-      {previewOpen && previewUrl && (
-        <div className="pdf-preview-overlay" role="dialog" aria-label="PDF preview">
-          <div className="pdf-preview-backdrop" onClick={() => { setPreviewOpen(false); setTimeout(()=>{ if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) } }, 80) }} />
-          <div className="pdf-preview-popup" style={{ width: '86vw', maxWidth: 1100 }}>
-            <div className="pdf-preview-header">
-              <div className="pdf-preview-title">Preview</div>
-              <div className="pdf-preview-meta">Previewing compressed file</div>
-              <button className="btn small" onClick={() => { setPreviewOpen(false); if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) } }} aria-label="Close preview">✕</button>
-            </div>
-            <div className="pdf-preview-body">
-              <div style={{ width: '100%', height: '70vh' }}>
-                <PdfViewer src={previewUrl} filename={file?.name} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <PdfPreviewModal
+        open={previewOpen}
+        url={previewUrl}
+        filename={file?.name}
+        meta="Previewing compressed file"
+        onClose={closePreview}
+      />
 
       <div className="page-header">
         <div>
@@ -149,20 +138,11 @@ export default function Compress() {
       </div>
 
       {!file ? (
-        <Card className="upload-zone">
-          <div className="upload-content">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <h3>Upload a PDF to Compress</h3>
-            <p>Drag and drop your PDF here, or click to browse</p>
-            <Button variant="secondary" onClick={() => (document.getElementById('compress-upload') as HTMLInputElement | null)?.click()}>
-              Select File
-            </Button>
-          </div>
-        </Card>
+        <UploadZone
+          title="Upload a PDF to Compress"
+          inputId="compress-upload"
+          onFile={onFileChange}
+        />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           <Card className="card-padding">

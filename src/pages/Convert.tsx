@@ -5,7 +5,8 @@ import './PageLayout.css'
 import './ops.css'
 import { useToast } from '../components/ToastProvider'
 import { convertPdfToImages, convertPdfToText, convertImagesToPdf, convertTextToPdf } from '../utils/pdfConvert'
-import { downloadBlob, validateFile } from '../utils/pdfUtils'
+import { downloadBlob, validateFile, formatFileSize } from '../utils/pdfUtils'
+import UploadZone from '../components/UploadZone'
 import JSZip from 'jszip'
 
 type ConversionFormat = 'png' | 'jpg' | 'txt' | 'docx'
@@ -208,11 +209,6 @@ export default function Convert() {
     }
   }
 
-  function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return bytes + ' B'
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
-  }
 
   const isImageFormat = format === 'png' || format === 'jpg'
   const isPdfToOther = mode === 'pdf-to-other'
@@ -262,20 +258,12 @@ export default function Convert() {
       </Card>
 
       {!file ? (
-        <Card className="upload-zone">
-          <div className="upload-content">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <h3>Upload {isPdfToOther ? 'a PDF' : 'files'} to Convert</h3>
-            <p>Drag and drop {isPdfToOther ? 'a PDF' : 'files'} here, or click to browse</p>
-            <Button variant="secondary" onClick={() => (document.getElementById('convert-upload') as HTMLInputElement | null)?.click()}>
-              Select File
-            </Button>
-          </div>
-        </Card>
+        <UploadZone
+          title={`Upload ${isPdfToOther ? 'a PDF' : 'files'} to Convert`}
+          inputId="convert-upload"
+          onFile={onFileChange}
+          subtitle={`Drag and drop ${isPdfToOther ? 'a PDF' : 'files'} here, or click to browse`}
+        />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           <Card className="card-padding">
