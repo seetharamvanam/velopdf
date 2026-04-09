@@ -4,8 +4,9 @@
  * Note: Full form implementation requires pdf-lib form field creation
  */
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '../components/ui/Button'
+import Card from '../components/ui/Card'
 import UploadZone from '../components/UploadZone'
 import './PageLayout.css'
 import './ops.css'
@@ -60,8 +61,6 @@ export default function Forms() {
         addToast('Failed to load form')
       }
     }
-
-    e.target.value = ''
   }
 
   async function handleFillForm() {

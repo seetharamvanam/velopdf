@@ -1,4 +1,3 @@
-import React from 'react'
 import PdfViewer from './PdfViewer'
 
 interface PdfPreviewModalProps {
@@ -13,9 +12,13 @@ export default function PdfPreviewModal({ open, url, filename, meta = 'Previewin
   if (!open || !url) return null
 
   return (
-    <div className="pdf-preview-overlay" role="dialog" aria-label="PDF preview">
-      <div className="pdf-preview-backdrop" onClick={onClose} />
-      <div className="pdf-preview-popup" style={{ width: '86vw', maxWidth: 1100 }}>
+    <div className="pdf-preview-overlay">
+      <div
+        className="pdf-preview-backdrop"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <dialog open className="pdf-preview-popup" aria-label="PDF preview" style={{ width: '86vw', maxWidth: 1100 }}>
         <div className="pdf-preview-header">
           <div className="pdf-preview-title">Preview</div>
           <div className="pdf-preview-meta">{meta}</div>
@@ -26,7 +29,7 @@ export default function PdfPreviewModal({ open, url, filename, meta = 'Previewin
             <PdfViewer src={url} filename={filename} />
           </div>
         </div>
-      </div>
+      </dialog>
     </div>
   )
 }

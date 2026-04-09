@@ -8,7 +8,6 @@ interface UploadZoneProps {
   onFile?: (file: File) => void
   onFiles?: (files: File[]) => void
   subtitle?: string
-  accept?: string
   multiple?: boolean
   selectLabel?: string
   children?: React.ReactNode
@@ -20,7 +19,6 @@ export default function UploadZone({
   onFile,
   onFiles,
   subtitle = 'Drag and drop your PDF here, or click to browse',
-  accept = 'application/pdf',
   multiple = false,
   selectLabel,
   children,

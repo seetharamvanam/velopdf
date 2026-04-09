@@ -304,7 +304,6 @@ export default function OCR() {
           inputId="ocr-upload"
           onFile={onFileChange}
           subtitle="Drag and drop a PDF or image file here, or click to browse"
-          accept="application/pdf,image/*"
         >
           <div style={{ marginTop: 16, fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>
             Supported: PDF, PNG, JPG, JPEG, GIF, WEBP, BMP<br />

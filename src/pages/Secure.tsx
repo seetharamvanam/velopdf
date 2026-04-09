@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import * as pdfLib from 'pdf-lib'
 import Button from '../components/ui/Button'
+import Card from '../components/ui/Card'
 import UploadZone from '../components/UploadZone'
 import './PageLayout.css'
 import { useToast } from '../components/ToastProvider'
