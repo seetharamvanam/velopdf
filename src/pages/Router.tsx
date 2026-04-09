@@ -1,23 +1,24 @@
-import Home from './Home'
-import Merge from './Merge'
-import Split from './Split'
-import Compress from './Compress'
-import Convert from './Convert'
-import Secure from './Secure'
-import View from './View'
-import Edit from './Edit'
-import Advanced from './Advanced'
-import Create from './Create'
-import Annotate from './Annotate'
-import Organize from './Organize'
-import Forms from './Forms'
-import OCR from './OCR'
-import Utilities from './Utilities'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import PageTransition from '../components/ui/PageTransition'
 
-const ROUTES: Record<string, React.FC> = {
+const Home = lazy(() => import('./Home'))
+const Merge = lazy(() => import('./Merge'))
+const Split = lazy(() => import('./Split'))
+const Compress = lazy(() => import('./Compress'))
+const Convert = lazy(() => import('./Convert'))
+const Secure = lazy(() => import('./Secure'))
+const View = lazy(() => import('./View'))
+const Edit = lazy(() => import('./Edit'))
+const Advanced = lazy(() => import('./Advanced'))
+const Create = lazy(() => import('./Create'))
+const Annotate = lazy(() => import('./Annotate'))
+const Organize = lazy(() => import('./Organize'))
+const Forms = lazy(() => import('./Forms'))
+const OCR = lazy(() => import('./OCR'))
+const Utilities = lazy(() => import('./Utilities'))
+
+const ROUTES: Record<string, React.LazyExoticComponent<React.FC>> = {
   '': Home,
   '#': Home,
   '#home': Home,
@@ -37,6 +38,32 @@ const ROUTES: Record<string, React.FC> = {
   '#advanced': Advanced,
 }
 
+function PageLoader() {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 'calc(100vh - 80px)',
+      color: 'var(--text-tertiary)',
+      fontSize: '0.9rem',
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{
+          width: 32,
+          height: 32,
+          border: '3px solid var(--border-primary)',
+          borderTopColor: 'var(--color-primary-600)',
+          borderRadius: '50%',
+          animation: 'spin 0.7s linear infinite',
+          margin: '0 auto 12px',
+        }} />
+        Loading…
+      </div>
+    </div>
+  )
+}
+
 export default function Router() {
   const [hash, setHash] = useState<string>(() => {
     if (typeof window !== 'undefined') {
@@ -46,8 +73,8 @@ export default function Router() {
   })
 
   useEffect(() => {
-    function onHash() { 
-      setHash(window.location.hash || '#') 
+    function onHash() {
+      setHash(window.location.hash || '#')
     }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
@@ -58,7 +85,9 @@ export default function Router() {
   return (
     <AnimatePresence mode="wait">
       <PageTransition key={hash}>
-        <Page />
+        <Suspense fallback={<PageLoader />}>
+          <Page />
+        </Suspense>
       </PageTransition>
     </AnimatePresence>
   )

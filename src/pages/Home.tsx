@@ -1,10 +1,9 @@
-import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import './Home.css'
 import './ops.css'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import { IconPdf, IconMerge, IconSplit, IconCompress, IconConvert, IconSecure } from '../components/icons' 
+import { IconPdf, IconMerge, IconSplit, IconCompress, IconConvert, IconSecure } from '../components/icons'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -22,7 +21,6 @@ const itemVariants = {
 }
 
 export default function Home() {
-  useEffect(() => { }, [])
 
   return (
     <main className="home-page">
@@ -129,12 +127,12 @@ export default function Home() {
               </div>
               <div className="visual-stats">
                 <div className="stat-card">
-                  <div className="stat-value">10M+</div>
-                  <div className="stat-desc">Documents Processed</div>
+                  <div className="stat-value">0</div>
+                  <div className="stat-desc">Server Uploads</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-value">4.9★</div>
-                  <div className="stat-desc">User Rating</div>
+                  <div className="stat-value">15+</div>
+                  <div className="stat-desc">PDF Tools</div>
                 </div>
               </div>
             </div>
@@ -198,7 +196,7 @@ export default function Home() {
               <Card className="feature-card">
                 <div className="feature-icon-wrapper"><IconCompress /></div>
                 <div className="feature-content">
-                  <h3 className="feature-name">AI Compression</h3>
+                  <h3 className="feature-name">Smart Compression</h3>
                   <p className="feature-desc">Reduce file size significantly while maintaining crystal-clear quality using advanced algorithms.</p>
                 </div>
               </Card>
@@ -208,8 +206,8 @@ export default function Home() {
               <Card className="feature-card">
                 <div className="feature-icon-wrapper"><IconConvert /></div>
                 <div className="feature-content">
-                  <h3 className="feature-name">Universal Convert</h3>
-                  <p className="feature-desc">Seamlessly convert between PDF, Word, Excel, and high-resolution images with perfect formatting.</p>
+                  <h3 className="feature-name">Convert &amp; Export</h3>
+                  <p className="feature-desc">Convert PDFs to images, extract text with OCR, create PDFs from images, and more — all in your browser.</p>
                 </div>
               </Card>
             </motion.div>
@@ -319,11 +317,15 @@ export default function Home() {
             <div className="demo-card">
               <div className="demo-header">
                 <span className="demo-icon">🚀</span>
-                <span className="demo-title">Try it now</span>
+                <span className="demo-title">Merge PDFs</span>
               </div>
-              <p className="demo-desc">Experience the power of VeloPDF with sample documents</p>
-              <Button variant="primary" className="demo-btn">
-                Start Demo
+              <p className="demo-desc">Combine multiple PDFs into one — drag, drop, and reorder pages instantly</p>
+              <Button
+                variant="primary"
+                className="demo-btn"
+                onClick={() => { window.location.hash = '#merge' }}
+              >
+                Try Merge Tool →
               </Button>
             </div>
           </motion.div>
@@ -371,28 +373,41 @@ export default function Home() {
                 <a href="#convert">Convert Files</a>
               </div>
               <div className="link-group">
-                <h4 className="group-title">Company</h4>
-                <a href="#">About Us</a>
-                <a href="#">Careers</a>
-                <a href="#">Press</a>
-                <a href="#">Blog</a>
+                <h4 className="group-title">Tools</h4>
+                <a href="#edit">Edit PDF</a>
+                <a href="#annotate">Annotate</a>
+                <a href="#organize">Organize Pages</a>
+                <a href="#ocr">OCR (Scan to Text)</a>
               </div>
               <div className="link-group">
-                <h4 className="group-title">Support</h4>
-                <a href="#">Help Center</a>
-                <a href="#">Contact Us</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
+                <h4 className="group-title">More</h4>
+                <a href="#secure">Secure &amp; Protect</a>
+                <a href="#utilities">Utilities</a>
+                <a href="#forms">Forms</a>
+                <a href="#advanced">Advanced</a>
               </div>
             </div>
           </div>
 
           <div className="footer-newsletter">
-            <h4>Stay Updated</h4>
-            <p>Get the latest updates on new features and improvements.</p>
-            <div className="newsletter-form">
-              <input type="email" placeholder="Enter your email" className="newsletter-input" />
-              <Button variant="primary" className="newsletter-btn">Subscribe</Button>
+            <h4>Get Started Free</h4>
+            <p>All tools are free to use. No account required. Your files never leave your device.</p>
+            <div className="footer-cta-row">
+              <Button
+                variant="primary"
+                className="newsletter-btn"
+                onClick={() => { window.location.hash = '#merge' }}
+              >
+                Merge PDFs
+              </Button>
+              <Button
+                variant="ghost"
+                className="newsletter-btn"
+                onClick={() => { window.location.hash = '#compress' }}
+                style={{ marginLeft: '0.75rem' }}
+              >
+                Compress PDF
+              </Button>
             </div>
           </div>
         </div>

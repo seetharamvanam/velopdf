@@ -15,6 +15,7 @@ export default function Compress() {
   const [compressedFile, setCompressedFile] = useState<{ url: string; size: number; originalSize: number } | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
     return () => {
@@ -149,16 +150,28 @@ export default function Compress() {
       </div>
 
       {!file ? (
-        <Card className="upload-zone">
+        <Card
+          className={`upload-zone${dragging ? ' upload-zone--dragging' : ''}`}
+          onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+          onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false) }}
+          onDrop={(e) => {
+            e.preventDefault()
+            setDragging(false)
+            const dropped = e.dataTransfer.files?.[0]
+            if (dropped) onFileChange(dropped)
+          }}
+          onClick={() => (document.getElementById('compress-upload') as HTMLInputElement | null)?.click()}
+          style={{ cursor: 'pointer' }}
+        >
           <div className="upload-content">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="17 8 12 3 7 8" />
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
-            <h3>Upload a PDF to Compress</h3>
+            <h3>{dragging ? 'Drop your PDF here' : 'Upload a PDF to Compress'}</h3>
             <p>Drag and drop your PDF here, or click to browse</p>
-            <Button variant="secondary" onClick={() => (document.getElementById('compress-upload') as HTMLInputElement | null)?.click()}>
+            <Button variant="secondary" onClick={(e) => { e.stopPropagation(); (document.getElementById('compress-upload') as HTMLInputElement | null)?.click() }}>
               Select File
             </Button>
           </div>
